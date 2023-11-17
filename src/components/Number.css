@@ -1,0 +1,7 @@
+.number {
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3d4043;
+  padding: 1rem 0;
+  width: 100%;
+}

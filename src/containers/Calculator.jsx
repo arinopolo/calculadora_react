@@ -2,65 +2,188 @@ import React from "react";
 import Operation from "../components/Operation";
 import Output from "../components/Output";
 import Number from "../components/Number";
+import Even from "../components/Even";
 import "./Calculator.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Calculator = () => {
-  const [currentNumber, setCurrentNumber] = useState("0");
-  const [currentAction, setCurrentAction] = useState();
+  const [currentOpOne, setCurrentOpOne] = useState("0");
+  const [currentOpTwo, setCurrentOpTwo] = useState("");
+  const [currentOperation, setCurrentOperation] = useState("");
+  const [finish, setFinish] = useState(false);
 
-  let op1 = "";
-  let op2 = "";
-  let operation = "";
-
-  const handleClick = (number, action, even) => {
-    if (number) {
-      if (op2 === "" && operation === "") {
-        if (currentNumber === "0" || currentNumber === ".") {
-          setCurrentNumber(number);
-          op1 = currentNumber;
+  // click en un numero
+  const handleNumberClick = (number) => {
+    if (!currentOperation && currentOpTwo === "") {
+      setCurrentOpOne((prevOpOne) => {
+        if (prevOpOne === "0" || prevOpOne === "." || finish) {
+          setFinish(false);
+          return number;
+        } else if (number === "." && prevOpOne.includes(".")) {
+          return prevOpOne;
         } else {
-          setCurrentNumber(currentNumber + number);
-          op1 = currentNumber;
+          return prevOpOne + number;
         }
-      }
-    } else if (action) {
-      setCurrentAction(action);
-    } /* else {
-        calculate( op1, op2, operation);
-    } */
-    console.log(`your op1 ${op1}`);
+      });
+    } else if (currentOperation) {
+      setCurrentOpTwo((prevOpTwo) => {
+        if (prevOpTwo === "0" || prevOpTwo === ".") {
+          return number;
+        } else if (number === "." && prevOpTwo.includes(".")) {
+          return prevOpTwo;
+        } else {
+          return prevOpTwo + number;
+        }
+      });
+    }
   };
 
+  //click en accion
+  const handleActionClick = (action) => {
+    setCurrentOperation(action);
+  };
+
+  // click en AC
+  const handleAcClick = () => {
+    setCurrentOpOne("0");
+    setCurrentOpTwo("");
+    setCurrentOperation("");
+    setFinish(false);
+  };
+
+  // click positive negative
+  const handlePositiveNegative = () => {
+    if (currentOpTwo === "" && currentOperation === "") {
+      setCurrentOpOne(
+        currentOpOne.startsWith("-")
+          ? currentOpOne.slice(1)
+          : "-" + currentOpOne
+      );
+    } else if (currentOpOne !== "" && currentOperation !== "") {
+      setCurrentOpTwo(
+        currentOpTwo.startsWith("-")
+          ? currentOpTwo.slice(1)
+          : "-" + currentOpTwo
+      );
+    }
+  };
+
+  // porcentaje
+
+  const calculatePercentage = () => {
+    if (currentOpTwo === "" && currentOperation === "") {
+      let a = parseFloat(currentOpOne);
+      a = a / 100;
+      setCurrentOpOne(a.toString());
+    } else if (currentOpOne !== "" && currentOperation !== "") {
+      let b = parseFloat(currentOpTwo);
+      b = b / 100;
+      setCurrentOpTwo(b.toString());
+    }
+  };
+
+  // eleminar uno
+  const deleteOne = () => {
+    if (currentOpTwo === "" && currentOperation === "") {
+      setCurrentOpOne(currentOpOne.slice(0, -1));
+      if (currentOpOne.length === 1) {
+        setCurrentOpOne("0");
+      }
+    } else if (currentOpOne !== "" && currentOperation !== "") {
+      setCurrentOpTwo(currentOpTwo.slice(0, -1));
+    }
+  };
+
+  // funciones de matematica
+  function sum(a, b) {
+    return a + b;
+  }
+  function substract(a, b) {
+    return a - b;
+  }
+  function multiply(a, b) {
+    return a * b;
+  }
+  function divide(a, b) {
+    return a / b;
+  }
+
+  // la funcion calcular
+  const calculate = () => {
+    let newResult = "";
+
+    if (currentOpOne === "" || currentOpTwo === "" || currentOperation === "") {
+      newResult = "Pon todos los operadores";
+    }
+    if (currentOpTwo === "0" && currentOperation === "/") {
+      newResult = "No se puede dividir por 0";
+    } else {
+      const num1 = parseFloat(currentOpOne);
+      const num2 = parseFloat(currentOpTwo);
+      switch (currentOperation) {
+        case "+":
+          newResult = sum(num1, num2);
+          break;
+        case "-":
+          newResult = substract(num1, num2);
+          break;
+        case "x":
+          newResult = multiply(num1, num2);
+          break;
+        case "/":
+          newResult = divide(num1, num2);
+          break;
+      }
+    }
+
+    //no se me resetea
+    setCurrentOpOne(newResult.toString());
+    setCurrentOpTwo("");
+    setCurrentOperation("");
+    setFinish(true);
+  };
+  /*
+  useEffect(() => {
+    console.log(
+      `your op1 ${currentOpOne} and the operation is ${currentOperation} and op2 is ${currentOpTwo} y el resultado es ${currentOpOne} y finish es ${finish} `
+    );
+  }, [currentOpOne, currentOperation, currentOpTwo, finish]);
+*/
+
+  // visual
   return (
     <div className="calculator-container">
-      <Output outputNumber={currentNumber} outputAction={currentAction} />
+      <Output
+        outputNumberOne={currentOpOne}
+        outputAction={currentOperation}
+        outputNumberTwo={currentOpTwo}
+      />
       <div className="buttons-container">
         <div className="buttons">
-          <Number number={"7"} onClick={handleClick} />
-          <Number number={"8"} onClick={handleClick} />
-          <Number number={"9"} onClick={handleClick} />
-          <Number number={"4"} onClick={handleClick} />
-          <Number number={"5"} onClick={handleClick} />
-          <Number number={"6"} onClick={handleClick} />
-          <Number number={"1"} onClick={handleClick} />
-          <Number number={"2"} onClick={handleClick} />
-          <Number number={"3"} onClick={handleClick} />
-          <Number number={"0"} onClick={handleClick} />
-          <Number number={"."} onClick={handleClick} />
-          <Number number={"AC"} onClick={handleClick} />
-          <Number number={"+/-"} onClick={handleClick} />
-          <Number number={"%"} onClick={handleClick} />
-          <Number number={"del"} onClick={handleClick} />
+          <Number number={"7"} onClick={handleNumberClick} />
+          <Number number={"8"} onClick={handleNumberClick} />
+          <Number number={"9"} onClick={handleNumberClick} />
+          <Number number={"4"} onClick={handleNumberClick} />
+          <Number number={"5"} onClick={handleNumberClick} />
+          <Number number={"6"} onClick={handleNumberClick} />
+          <Number number={"1"} onClick={handleNumberClick} />
+          <Number number={"2"} onClick={handleNumberClick} />
+          <Number number={"3"} onClick={handleNumberClick} />
+          <Number number={"0"} onClick={handleNumberClick} />
+          <Number number={"."} onClick={handleNumberClick} />
+          <Number number={"AC"} onClick={handleAcClick} />
+          <Number number={"+/-"} onClick={handlePositiveNegative} />
+          <Number number={"%"} onClick={calculatePercentage} />
+          <Number number={"del"} onClick={deleteOne} />
         </div>
         <div className="actions-container">
           <div className="actions">
-            <Operation action={"/"} onClick={handleClick} />
-            <Operation action={"x"} onClick={handleClick} />
-            <Operation action={"-"} onClick={handleClick} />
-            <Operation action={"+"} onClick={handleClick} />
+            <Operation action={"/"} onClick={handleActionClick} />
+            <Operation action={"x"} onClick={handleActionClick} />
+            <Operation action={"-"} onClick={handleActionClick} />
+            <Operation action={"+"} onClick={handleActionClick} />
           </div>
-          <div className="even">=</div>
+          <Even onClick={calculate} even="=" />
         </div>
       </div>
     </div>

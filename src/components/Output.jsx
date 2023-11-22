@@ -1,11 +1,20 @@
 import "./Output.css";
 
-
-const Output = ({ outputNumber, outputAction }) => {
+const Output = ({ outputNumberOne, outputAction, outputNumberTwo, result }) => {
   return (
     <div className="input-view">
       <div className="output-number">
-        <span>{outputNumber}</span> <span>{outputAction}</span>
+        {result ? (
+          <>
+            <span>{result}</span>
+          </>
+        ) : (
+          <>
+            <span>{outputNumberOne}</span>
+            <span>{outputAction}</span>
+            <span>{outputNumberTwo}</span>
+          </>
+        )}
       </div>
     </div>
   );

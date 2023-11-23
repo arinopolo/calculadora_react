@@ -142,13 +142,6 @@ const Calculator = () => {
     setCurrentOperation("");
     setFinish(true);
   };
-  /*
-  useEffect(() => {
-    console.log(
-      `your op1 ${currentOpOne} and the operation is ${currentOperation} and op2 is ${currentOpTwo} y el resultado es ${currentOpOne} y finish es ${finish} `
-    );
-  }, [currentOpOne, currentOperation, currentOpTwo, finish]);
-*/
 
   // visual
   return (
